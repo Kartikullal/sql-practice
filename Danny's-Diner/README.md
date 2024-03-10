@@ -25,4 +25,4 @@ Danny has shared with you 3 key datasets for this case study:
 
 You can inspect the entity relationship diagram and example data below.
 
-![ERD Diagram for the tables](/images/erd.png)
+![ERD Diagram for the tables](images/erd.png)
