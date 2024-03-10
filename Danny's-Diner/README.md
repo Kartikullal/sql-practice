@@ -41,3 +41,7 @@ FROM SALES s
         ON s.product_id = m.product_id
 GROUP BY 1;
 ```
+
+Plot for total amount: 
+
+![Total Amount per customer](images/q1.png)
