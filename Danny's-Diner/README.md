@@ -45,3 +45,219 @@ GROUP BY 1;
 Plot for total amount: 
 
 ![Total Amount per customer](images/q1.png)
+
+
+### How many days has each customer visited the restaurant?
+
+```
+SELECT
+    s.customer_id,
+    COUNT(DISTINCT order_date) AS no_of_days
+FROM SALES s
+GROUP BY 1;
+```
+![Number of visits per customer](images/q2.png)
+
+### What was the first item from the menu purchased by each customer?
+
+```
+WITH cte AS (
+SELECT
+    s.customer_id,
+    s.product_id,
+    ROW_NUMBER() OVER(
+            PARTITION BY s.customer_id
+            ORDER BY s.order_date) as rnk
+FROM sales s
+)
+SELECT
+    c.customer_id,
+    m.product_name
+FROM cte c
+    JOIN menu m
+        ON c.product_id = m.product_id
+WHERE rnk = 1;
+```
+![First item purchased](/images/q3.png)
+
+### What is the most purchased item on the menu and how many times was it purchased by all customers??
+
+#### Most orderd item
+
+```
+SELECT
+    product_name,
+    COUNT(product_name) as product_count
+FROM sales s
+    JOIN menu m
+        ON s.product_id = m.product_id
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 1;
+```
+
+![Most ordered](/images/q4-1.png)
+
+```
+with cte as 
+(SELECT
+    product_id,
+    COUNT(product_id) as product_count
+FROM sales s
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 1)
+SELECT 
+    customer_id,
+    product_name,
+    COUNT(s.product_id) as product_count
+FROM sales s
+    JOIN menu m
+        ON s.product_id = m.product_id
+WHERE s.product_id = (
+                    SELECT
+                        c.product_id
+                    FROM cte c
+                )
+GROUP BY 1,2;
+```
+![Most ordered item count by each customer](/images/q4-2.png)
+
+
+### Which item was the most popular for each customer?
+
+```
+with cte as 
+(SELECT
+    customer_id,
+    product_name,
+    COUNT(product_name) as product_count,
+    ROW_NUMBER() OVER(
+                PARTITION BY customer_id
+                ORDER BY COUNT(product_name) DESC
+    ) as rnk 
+FROM sales s
+    JOIN menu m
+        ON s.product_id = m.product_id
+GROUP BY 1,2
+)
+SELECT
+    customer_id,
+    product_name
+FROM cte
+WHERE rnk = 1;
+```
+![First item purchased](/images/q5.png)
+
+### Which item was purchased first by the customer after they became a member?
+
+```
+WITH cte AS(
+SELECT
+    s.customer_id,
+    product_name,
+    ROW_NUMBER() OVER(
+        PARTITION BY s.customer_id
+        ORDER BY order_date
+    ) as rnk
+FROM sales s
+    JOIN menu m 
+        ON m.product_id = s.product_id
+    JOIN members c
+        ON s.customer_id = c.customer_id
+            AND s.order_date >= c.join_date
+)
+SELECT
+    customer_id,
+    product_name
+FROM cte
+WHERE rnk = 1;
+```
+![First item purchased](/images/q6.png)
+
+### Which item was purchased first by the customer after they became a member?
+
+```
+WITH cte AS(
+SELECT
+    s.customer_id,
+    product_name,
+    RANK() OVER(
+        PARTITION BY s.customer_id
+        ORDER BY order_date DESC
+    ) as rnk
+FROM sales s
+    JOIN menu m 
+        ON m.product_id = s.product_id
+    JOIN members c
+        ON s.customer_id = c.customer_id
+            AND s.order_date < c.join_date
+)
+SELECT
+    customer_id,
+    product_name
+FROM cte
+WHERE rnk = 1;
+```
+![First item purchased](/images/q7.png)
+
+ 
+
+### What is the total items and amount spent for each member before they became a member?
+
+```
+SELECT
+    s.customer_id,
+    COUNT(m.product_name) AS total_items,
+    SUM(m.price) AS total_amount_spent
+FROM sales s
+    JOIN menu m 
+        ON m.product_id = s.product_id
+    JOIN members c
+        ON s.customer_id = c.customer_id
+            AND s.order_date < c.join_date
+GROUP BY 1;
+```
+![First item purchased](/images/q8.png)
+
+
+### If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
+
+```
+SELECT
+    s.customer_id,
+    SUM(
+        CASE
+            WHEN s.product_id = 1 THEN 2 * 10 * m.price
+            ELSE 10 * m.price
+        END
+    ) as total_points
+FROM sales s
+    JOIN menu m 
+        ON m.product_id = s.product_id
+GROUP BY 1;
+```
+![First item purchased](/images/q9.png)
+
+### In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
+
+```
+SELECT
+    s.customer_id,
+    SUM(
+        CASE
+            WHEN s.order_date >= c.join_date THEN 2 * 10 * m.price
+            ELSE 10 * m.price
+        END
+    ) as total_points
+FROM sales s
+    JOIN menu m 
+        ON m.product_id = s.product_id
+    JOIN members c
+        ON s.customer_id = c.customer_id
+WHERE MONTH(order_date) = 1 
+    AND s.customer_id in ('A','B')
+GROUP BY 1
+ORDER BY 2 DESC;
+```
+![First item purchased](/images/q10.png)
