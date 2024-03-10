@@ -26,3 +26,18 @@ Danny has shared with you 3 key datasets for this case study:
 You can inspect the entity relationship diagram and example data below.
 
 ![ERD Diagram for the tables](images/erd.png)
+
+
+## Cast Study Questions
+
+### What is the total amount each customer spent at the restaurant?
+
+```
+SELECT
+    s.customer_id,
+    SUM(price) AS total_spent
+FROM SALES s
+    JOIN menu m 
+        ON s.product_id = m.product_id
+GROUP BY 1;
+```
