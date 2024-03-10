@@ -78,7 +78,7 @@ FROM cte c
         ON c.product_id = m.product_id
 WHERE rnk = 1;
 ```
-![First item purchased](/images/q3.png)
+![First item purchased](images/q3.png)
 
 ### What is the most purchased item on the menu and how many times was it purchased by all customers??
 
@@ -96,7 +96,7 @@ ORDER BY 2 DESC
 LIMIT 1;
 ```
 
-![Most ordered](/images/q4-1.png)
+![Most ordered](images/q4-1.png)
 
 ```
 with cte as 
@@ -121,7 +121,7 @@ WHERE s.product_id = (
                 )
 GROUP BY 1,2;
 ```
-![Most ordered item count by each customer](/images/q4-2.png)
+![Most ordered item count by each customer](images/q4-2.png)
 
 
 ### Which item was the most popular for each customer?
@@ -147,7 +147,7 @@ SELECT
 FROM cte
 WHERE rnk = 1;
 ```
-![First item purchased](/images/q5.png)
+![First item purchased](images/q5.png)
 
 ### Which item was purchased first by the customer after they became a member?
 
@@ -173,7 +173,7 @@ SELECT
 FROM cte
 WHERE rnk = 1;
 ```
-![First item purchased](/images/q6.png)
+![First item purchased](images/q6.png)
 
 ### Which item was purchased first by the customer after they became a member?
 
@@ -199,7 +199,7 @@ SELECT
 FROM cte
 WHERE rnk = 1;
 ```
-![First item purchased](/images/q7.png)
+![First item purchased](images/q7.png)
 
  
 
@@ -218,7 +218,7 @@ FROM sales s
             AND s.order_date < c.join_date
 GROUP BY 1;
 ```
-![First item purchased](/images/q8.png)
+![First item purchased](images/q8.png)
 
 
 ### If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
@@ -237,7 +237,7 @@ FROM sales s
         ON m.product_id = s.product_id
 GROUP BY 1;
 ```
-![First item purchased](/images/q9.png)
+![First item purchased](images/q9.png)
 
 ### In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
 
@@ -260,4 +260,4 @@ WHERE MONTH(order_date) = 1
 GROUP BY 1
 ORDER BY 2 DESC;
 ```
-![First item purchased](/images/q10.png)
+![First item purchased](images/q10.png)
